@@ -1,2 +1,4 @@
 error: unknown lint level: `test`
+  |
+  = help: valid lint levels are: `allow`, `warn`, `deny`, `forbid`
 

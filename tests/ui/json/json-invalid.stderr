@@ -1,2 +1,4 @@
-error: unknown `--json` option `foo`
+error: unknown `--json` option: `foo`
+  |
+  = help: valid `--json` options are: `diagnostic-short`, `diagnostic-unicode`, `diagnostic-rendered-ansi`, `artifacts`, `timings`, `unused-externs`, `unused-externs-silent`, `future-incompat`
 

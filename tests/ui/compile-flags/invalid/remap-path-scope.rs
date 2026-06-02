@@ -4,6 +4,6 @@
 //@ [foo]compile-flags: --remap-path-scope=foo
 //@ [underscore]compile-flags: --remap-path-scope=macro_object
 
-//~? ERROR argument for `--remap-path-scope
+//~? ERROR unknown `--remap-path-scope` value
 
 fn main() {}

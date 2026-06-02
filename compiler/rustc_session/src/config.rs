@@ -1374,7 +1374,21 @@ pub fn parse_remap_path_scope(
                 "coverage" => RemapPathScopeComponents::COVERAGE,
                 "object" => RemapPathScopeComponents::OBJECT,
                 "all" => RemapPathScopeComponents::all(),
-                _ => early_dcx.early_fatal("argument for `--remap-path-scope` must be a comma separated list of scopes: `macro`, `diagnostics`, `documentation`, `debuginfo`, `coverage`, `object`, `all`"),
+                _ => build_unknown_arg_value_diag(
+                    early_dcx,
+                    "`--remap-path-scope` value",
+                    s,
+                    &[
+                        "macro",
+                        "diagnostics",
+                        "documentation",
+                        "debuginfo",
+                        "coverage",
+                        "object",
+                        "all",
+                    ],
+                )
+                .emit(),
             }
         }
         slot
@@ -2017,8 +2031,15 @@ pub fn get_cmd_lint_options(
         .collect();
 
     let lint_cap = matches.opt_str("cap-lints").map(|cap| {
-        cap.parse::<lint::Level>()
-            .unwrap_or_else(|()| early_dcx.early_fatal(format!("unknown lint level: `{cap}`")))
+        cap.parse::<lint::Level>().unwrap_or_else(|()| {
+            build_unknown_arg_value_diag(
+                early_dcx,
+                "lint level",
+                &cap,
+                lint::Level::FROM_STR_VARIANTS,
+            )
+            .emit()
+        })
     });
 
     (lint_opts, describe_lints, lint_cap)
@@ -2076,10 +2097,10 @@ pub fn parse_color(early_dcx: &EarlyDiagCtxt, matches: &getopts::Matches) -> Col
 
         None => ColorConfig::Auto,
 
-        Some(arg) => early_dcx.early_fatal(format!(
-            "argument for `--color` must be auto, \
-                 always or never (instead was `{arg}`)"
-        )),
+        Some(arg) => {
+            build_unknown_arg_value_diag(early_dcx, "color", arg, &["auto", "always", "never"])
+                .emit()
+        }
     }
 }
 
@@ -2155,7 +2176,22 @@ pub fn parse_json(early_dcx: &EarlyDiagCtxt, matches: &getopts::Matches) -> Json
                 "unused-externs" => json_unused_externs = JsonUnusedExterns::Loud,
                 "unused-externs-silent" => json_unused_externs = JsonUnusedExterns::Silent,
                 "future-incompat" => json_future_incompat = true,
-                s => early_dcx.early_fatal(format!("unknown `--json` option `{s}`")),
+                s => build_unknown_arg_value_diag(
+                    early_dcx,
+                    "`--json` option",
+                    s,
+                    &[
+                        "diagnostic-short",
+                        "diagnostic-unicode",
+                        "diagnostic-rendered-ansi",
+                        "artifacts",
+                        "timings",
+                        "unused-externs",
+                        "unused-externs-silent",
+                        "future-incompat",
+                    ],
+                )
+                .emit(),
             }
         }
     }
@@ -2509,7 +2545,13 @@ pub fn parse_externs(
                     }
                     "nounused" => nounused_dep = true,
                     "force" => force = true,
-                    _ => early_dcx.early_fatal(format!("unknown --extern option `{opt}`")),
+                    _ => build_unknown_arg_value_diag(
+                        early_dcx,
+                        "`--extern` option",
+                        opt,
+                        &["priv", "noprelude", "nounused", "force"],
+                    )
+                    .emit(),
                 }
             }
         }
