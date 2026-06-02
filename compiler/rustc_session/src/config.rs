@@ -2443,12 +2443,14 @@ fn parse_opt_level(
             "3" => OptLevel::Aggressive,
             "s" => OptLevel::Size,
             "z" => OptLevel::SizeMin,
-            arg => {
-                early_dcx.early_fatal(format!(
-                    "optimization level needs to be \
-                            between 0-3, s or z (instead was `{arg}`)"
-                ));
-            }
+            arg => build_unknown_option_value_diag(
+                early_dcx,
+                "codegen",
+                "opt-level",
+                arg,
+                &["0", "1", "2", "3", "s", "z"],
+            )
+            .emit(),
         }
     }
 }
