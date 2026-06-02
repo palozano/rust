@@ -98,20 +98,22 @@ rustc_data_structures::string_enum! {
     }
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Hash, StableHash, Encodable, Decodable)]
-pub enum OptLevel {
-    /// `-Copt-level=0`
-    No,
-    /// `-Copt-level=1`
-    Less,
-    /// `-Copt-level=2`
-    More,
-    /// `-Copt-level=3` / `-O`
-    Aggressive,
-    /// `-Copt-level=s`
-    Size,
-    /// `-Copt-level=z`
-    SizeMin,
+rustc_data_structures::string_enum! {
+    #[derive(Clone, Copy, Debug, PartialEq, Hash, StableHash, Encodable, Decodable)]
+    pub enum OptLevel {
+        /// `-Copt-level=0`
+        No => "0",
+        /// `-Copt-level=1`
+        Less => "1",
+        /// `-Copt-level=2`
+        More => "2",
+        /// `-Copt-level=3` / `-O`
+        Aggressive => "3",
+        /// `-Copt-level=s`
+        Size => "s",
+        /// `-Copt-level=z`
+        SizeMin => "z",
+    }
 }
 
 /// This is what the `LtoCli` values get mapped to after resolving defaults and
@@ -2436,22 +2438,16 @@ fn parse_opt_level(
     if max_o > max_c {
         OptLevel::Aggressive
     } else {
-        match cg.opt_level.as_ref() {
-            "0" => OptLevel::No,
-            "1" => OptLevel::Less,
-            "2" => OptLevel::More,
-            "3" => OptLevel::Aggressive,
-            "s" => OptLevel::Size,
-            "z" => OptLevel::SizeMin,
-            arg => build_unknown_option_value_diag(
+        cg.opt_level.parse::<OptLevel>().unwrap_or_else(|()| {
+            build_unknown_option_value_diag(
                 early_dcx,
                 "codegen",
                 "opt-level",
-                arg,
-                &["0", "1", "2", "3", "s", "z"],
+                &cg.opt_level,
+                OptLevel::FROM_STR_VARIANTS,
             )
-            .emit(),
-        }
+            .emit()
+        })
     }
 }
 
