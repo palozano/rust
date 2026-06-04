@@ -1511,18 +1511,7 @@ pub mod parse {
     }
 
     pub(crate) fn parse_dump_mono_stats(slot: &mut DumpMonoStatsFormat, v: Option<&str>) -> bool {
-        match v {
-            None => true,
-            Some("json") => {
-                *slot = DumpMonoStatsFormat::Json;
-                true
-            }
-            Some("markdown") => {
-                *slot = DumpMonoStatsFormat::Markdown;
-                true
-            }
-            Some(_) => false,
-        }
+        v.is_none() || parse_string_enum(slot, v)
     }
 
     pub(crate) fn parse_offload(slot: &mut Vec<Offload>, v: Option<&str>) -> bool {
@@ -1963,12 +1952,13 @@ pub mod parse {
     }
 
     pub(crate) fn parse_wasi_exec_model(slot: &mut Option<WasiExecModel>, v: Option<&str>) -> bool {
-        match v {
-            Some("command") => *slot = Some(WasiExecModel::Command),
-            Some("reactor") => *slot = Some(WasiExecModel::Reactor),
-            _ => return false,
+        match v.and_then(|s| s.parse::<WasiExecModel>().ok()) {
+            Some(model) => {
+                *slot = Some(model);
+                true
+            }
+            None => false,
         }
-        true
     }
 
     pub(crate) fn parse_split_debuginfo(
@@ -2050,12 +2040,7 @@ pub mod parse {
         slot: &mut ProcMacroExecutionStrategy,
         v: Option<&str>,
     ) -> bool {
-        *slot = match v {
-            Some("same-thread") => ProcMacroExecutionStrategy::SameThread,
-            Some("cross-thread") => ProcMacroExecutionStrategy::CrossThread,
-            _ => return false,
-        };
-        true
+        parse_string_enum(slot, v)
     }
 
     pub(crate) fn parse_inlining_threshold(slot: &mut InliningThreshold, v: Option<&str>) -> bool {

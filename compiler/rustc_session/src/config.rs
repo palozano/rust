@@ -3196,10 +3196,12 @@ impl PpMode {
     }
 }
 
-#[derive(Clone, Hash, PartialEq, Eq, Debug)]
-pub enum WasiExecModel {
-    Command,
-    Reactor,
+rustc_data_structures::string_enum! {
+    #[derive(Clone, Hash, PartialEq, Eq, Debug)]
+    pub enum WasiExecModel {
+        Command => "command",
+        Reactor => "reactor",
+    }
 }
 
 /// Command-line arguments passed to the compiler have to be incorporated with
@@ -3462,23 +3464,27 @@ pub(crate) mod dep_tracking {
     }
 }
 
-/// How to run proc-macro code when building this crate
-#[derive(Clone, Copy, PartialEq, Hash, Debug)]
-pub enum ProcMacroExecutionStrategy {
-    /// Run the proc-macro code on the same thread as the server.
-    SameThread,
+rustc_data_structures::string_enum! {
+    /// How to run proc-macro code when building this crate
+    #[derive(Clone, Copy, PartialEq, Hash, Debug)]
+    pub enum ProcMacroExecutionStrategy {
+        /// Run the proc-macro code on the same thread as the server.
+        SameThread => "same-thread",
 
-    /// Run the proc-macro code on a different thread.
-    CrossThread,
+        /// Run the proc-macro code on a different thread.
+        CrossThread => "cross-thread",
+    }
 }
 
-/// Which format to use for `-Z dump-mono-stats`
-#[derive(Clone, Copy, PartialEq, Hash, Debug)]
-pub enum DumpMonoStatsFormat {
-    /// Pretty-print a markdown table
-    Markdown,
-    /// Emit structured JSON
-    Json,
+rustc_data_structures::string_enum! {
+    /// Which format to use for `-Z dump-mono-stats`
+    #[derive(Clone, Copy, PartialEq, Hash, Debug)]
+    pub enum DumpMonoStatsFormat {
+        /// Pretty-print a markdown table
+        Markdown => "markdown",
+        /// Emit structured JSON
+        Json => "json",
+    }
 }
 
 impl DumpMonoStatsFormat {
