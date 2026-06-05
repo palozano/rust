@@ -181,30 +181,32 @@ pub struct CoverageOptions {
     pub discard_all_spans_in_codegen: bool,
 }
 
-/// Controls whether branch coverage is enabled.
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Default)]
-pub enum CoverageLevel {
-    /// Instrument for coverage at the MIR block level.
-    #[default]
-    Block,
-    /// Also instrument branch points (includes block coverage).
-    Branch,
-    /// Same as branch coverage, but also adds branch instrumentation for
-    /// certain boolean expressions that are not directly used for branching.
-    ///
-    /// For example, in the following code, `b` does not directly participate
-    /// in a branch, but condition coverage will instrument it as its own
-    /// artificial branch:
-    /// ```
-    /// # let (a, b) = (false, true);
-    /// let x = a && b;
-    /// //           ^ last operand
-    /// ```
-    ///
-    /// This level is mainly intended to be a stepping-stone towards full MC/DC
-    /// instrumentation, so it might be removed in the future when MC/DC is
-    /// sufficiently complete, or if it is making MC/DC changes difficult.
-    Condition,
+rustc_data_structures::string_enum! {
+    /// Controls whether branch coverage is enabled.
+    #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Default)]
+    pub enum CoverageLevel {
+        /// Instrument for coverage at the MIR block level.
+        #[default]
+        Block => "block",
+        /// Also instrument branch points (includes block coverage).
+        Branch => "branch",
+        /// Same as branch coverage, but also adds branch instrumentation for
+        /// certain boolean expressions that are not directly used for branching.
+        ///
+        /// For example, in the following code, `b` does not directly participate
+        /// in a branch, but condition coverage will instrument it as its own
+        /// artificial branch:
+        /// ```
+        /// # let (a, b) = (false, true);
+        /// let x = a && b;
+        /// //           ^ last operand
+        /// ```
+        ///
+        /// This level is mainly intended to be a stepping-stone towards full MC/DC
+        /// instrumentation, so it might be removed in the future when MC/DC is
+        /// sufficiently complete, or if it is making MC/DC changes difficult.
+        Condition => "condition",
+    }
 }
 
 // The different settings that the `-Z offload` flag can have.
@@ -583,12 +585,14 @@ impl SwitchWithOptPath {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, StableHash)]
-#[derive(Encodable, BlobDecodable)]
-pub enum SymbolManglingVersion {
-    Legacy,
-    V0,
-    Hashed,
+rustc_data_structures::string_enum! {
+    #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, StableHash)]
+    #[derive(Encodable, BlobDecodable)]
+    pub enum SymbolManglingVersion {
+        Legacy => "legacy",
+        V0 => "v0",
+        Hashed => "hashed",
+    }
 }
 
 rustc_data_structures::string_enum! {
@@ -620,34 +624,24 @@ rustc_data_structures::string_enum! {
     }
 }
 
-/// Split debug-information is enabled by `-C split-debuginfo`, this enum is only used if split
-/// debug-information is enabled (in either `Packed` or `Unpacked` modes), and the platform
-/// uses DWARF for debug-information.
-///
-/// Some debug-information requires link-time relocation and some does not. LLVM can partition
-/// the debuginfo into sections depending on whether or not it requires link-time relocation. Split
-/// DWARF provides a mechanism which allows the linker to skip the sections which don't require
-/// link-time relocation - either by putting those sections in DWARF object files, or by keeping
-/// them in the object file in such a way that the linker will skip them.
-#[derive(Clone, Copy, Debug, PartialEq, Hash, Encodable, Decodable)]
-pub enum SplitDwarfKind {
-    /// Sections which do not require relocation are written into object file but ignored by the
-    /// linker.
-    Single,
-    /// Sections which do not require relocation are written into a DWARF object (`.dwo`) file
-    /// which is ignored by the linker.
-    Split,
-}
-
-impl FromStr for SplitDwarfKind {
-    type Err = ();
-
-    fn from_str(s: &str) -> Result<Self, ()> {
-        Ok(match s {
-            "single" => SplitDwarfKind::Single,
-            "split" => SplitDwarfKind::Split,
-            _ => return Err(()),
-        })
+rustc_data_structures::string_enum! {
+    /// Split debug-information is enabled by `-C split-debuginfo`, this enum is only used if split
+    /// debug-information is enabled (in either `Packed` or `Unpacked` modes), and the platform
+    /// uses DWARF for debug-information.
+    ///
+    /// Some debug-information requires link-time relocation and some does not. LLVM can partition
+    /// the debuginfo into sections depending on whether or not it requires link-time relocation. Split
+    /// DWARF provides a mechanism which allows the linker to skip the sections which don't require
+    /// link-time relocation - either by putting those sections in DWARF object files, or by keeping
+    /// them in the object file in such a way that the linker will skip them.
+    #[derive(Clone, Copy, Debug, PartialEq, Hash, Encodable, Decodable)]
+    pub enum SplitDwarfKind {
+        /// Sections which do not require relocation are written into object file but ignored by the
+        /// linker.
+        Single => "single",
+        /// Sections which do not require relocation are written into a DWARF object (`.dwo`) file
+        /// which is ignored by the linker.
+        Split => "split",
     }
 }
 

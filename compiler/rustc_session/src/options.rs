@@ -1647,12 +1647,12 @@ pub mod parse {
         let Some(v) = v else { return true };
 
         for option in v.split(',') {
-            match option {
-                "block" => slot.level = CoverageLevel::Block,
-                "branch" => slot.level = CoverageLevel::Branch,
-                "condition" => slot.level = CoverageLevel::Condition,
-                "discard-all-spans-in-codegen" => slot.discard_all_spans_in_codegen = true,
-                _ => return false,
+            if let Ok(level) = option.parse::<CoverageLevel>() {
+                slot.level = level;
+            } else if option == "discard-all-spans-in-codegen" {
+                slot.discard_all_spans_in_codegen = true;
+            } else {
+                return false;
             }
         }
         true
@@ -1861,13 +1861,13 @@ pub mod parse {
         slot: &mut Option<SymbolManglingVersion>,
         v: Option<&str>,
     ) -> bool {
-        *slot = match v {
-            Some("legacy") => Some(SymbolManglingVersion::Legacy),
-            Some("v0") => Some(SymbolManglingVersion::V0),
-            Some("hashed") => Some(SymbolManglingVersion::Hashed),
-            _ => return false,
-        };
-        true
+        match v.and_then(|s| s.parse::<SymbolManglingVersion>().ok()) {
+            Some(version) => {
+                *slot = Some(version);
+                true
+            }
+            None => false,
+        }
     }
 
     pub(crate) fn parse_src_file_hash(
@@ -1973,11 +1973,7 @@ pub mod parse {
     }
 
     pub(crate) fn parse_split_dwarf_kind(slot: &mut SplitDwarfKind, v: Option<&str>) -> bool {
-        match v.and_then(|s| SplitDwarfKind::from_str(s).ok()) {
-            Some(e) => *slot = e,
-            _ => return false,
-        }
-        true
+        parse_string_enum(slot, v)
     }
 
     pub(crate) fn parse_stack_protector(slot: &mut StackProtector, v: Option<&str>) -> bool {
