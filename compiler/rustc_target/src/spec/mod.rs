@@ -825,12 +825,17 @@ crate::target_spec_enum! {
     parse_error_type = "panic strategy";
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Hash, Encodable, BlobDecodable, StableHash)]
-pub enum OnBrokenPipe {
-    Default,
-    Kill,
-    Error,
-    Inherit,
+rustc_data_structures::string_enum! {
+    #[derive(Clone, Copy, Debug, PartialEq, Hash, Encodable, BlobDecodable, StableHash)]
+    pub enum OnBrokenPipe {
+        // Internal-only sentinel: can never be supplied on the command
+        // line. Reachable only as the option's initial value before any
+        // `-Zon-broken-pipe=...` is parsed.
+        Default,
+        Kill => "kill",
+        Error => "error",
+        Inherit => "inherit",
+    }
 }
 
 impl PanicStrategy {

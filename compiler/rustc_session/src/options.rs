@@ -1327,14 +1327,10 @@ pub mod parse {
     }
 
     pub(crate) fn parse_on_broken_pipe(slot: &mut OnBrokenPipe, v: Option<&str>) -> bool {
-        match v {
-            // OnBrokenPipe::Default can't be explicitly specified
-            Some("kill") => *slot = OnBrokenPipe::Kill,
-            Some("error") => *slot = OnBrokenPipe::Error,
-            Some("inherit") => *slot = OnBrokenPipe::Inherit,
-            _ => return false,
-        }
-        true
+        // `OnBrokenPipe::Default` is declared as a bare variant in the
+        // `string_enum!`, so the generated `FromStr` will not produce it
+        // from any user-supplied string.
+        parse_string_enum(slot, v)
     }
 
     pub(crate) fn parse_patchable_function_entry(
