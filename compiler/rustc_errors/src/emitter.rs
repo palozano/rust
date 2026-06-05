@@ -399,11 +399,13 @@ impl Emitter for SilentEmitter {
 /// Arbitrary, but taken from trait import suggestion limit
 pub const MAX_SUGGESTIONS: usize = 4;
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum ColorConfig {
-    Auto,
-    Always,
-    Never,
+rustc_data_structures::string_enum! {
+    #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+    pub enum ColorConfig {
+        Auto => "auto",
+        Always => "always",
+        Never => "never",
+    }
 }
 
 impl ColorConfig {

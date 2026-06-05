@@ -2086,18 +2086,13 @@ pub fn build_unknown_option_value_diag<'a>(
 
 /// Parses the `--color` flag.
 pub fn parse_color(early_dcx: &EarlyDiagCtxt, matches: &getopts::Matches) -> ColorConfig {
-    match matches.opt_str("color").as_deref() {
-        Some("auto") => ColorConfig::Auto,
-        Some("always") => ColorConfig::Always,
-        Some("never") => ColorConfig::Never,
-
-        None => ColorConfig::Auto,
-
-        Some(arg) => {
-            build_unknown_arg_value_diag(early_dcx, "color", arg, &["auto", "always", "never"])
-                .emit()
-        }
-    }
+    let Some(arg) = matches.opt_str("color") else {
+        return ColorConfig::Auto;
+    };
+    arg.parse::<ColorConfig>().unwrap_or_else(|()| {
+        build_unknown_arg_value_diag(early_dcx, "color", &arg, ColorConfig::FROM_STR_VARIANTS)
+            .emit()
+    })
 }
 
 /// Possible json config files
