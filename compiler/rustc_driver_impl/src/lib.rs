@@ -1173,6 +1173,15 @@ fn print_flag_list<T>(cmdline_opt: &str, flag_list: &[OptionDesc<T>]) {
             opt_desc.desc(),
             width = max_len
         );
+        if let Some(values) = opt_desc.valid_values() {
+            let values = values.iter().map(|v| format!("`{v}`")).collect::<Vec<_>>().join(", ");
+            // Indent the continuation line to align under the desc column:
+            // 4 leading spaces + `cmdline_opt` (e.g. "-C") + space + name
+            // (padded to `max_len`) + "=val -- ". Computing this dynamically
+            // keeps it aligned if `cmdline_opt` ever changes width.
+            let indent = 4 + cmdline_opt.chars().count() + 1 + max_len + "=val -- ".len();
+            safe_println!("{:indent$}valid values: {values}", "", indent = indent);
+        }
     }
 }
 

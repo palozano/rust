@@ -714,6 +714,14 @@ impl<O> OptionDesc<O> {
     pub fn desc(&self) -> &'static str {
         self.desc
     }
+
+    /// The accepted string values for this option, when the parser maps a
+    /// closed string vocabulary onto an enum (declared via `[VALUES: ...]`
+    /// in the `options!` invocation). `None` for options that take
+    /// open-ended values (paths, numbers, free-form strings, …).
+    pub fn valid_values(&self) -> Option<&'static [&'static str]> {
+        self.valid_values
+    }
 }
 
 fn build_options<O: Default>(
