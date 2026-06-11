@@ -2281,7 +2281,7 @@ options! {
     strip: Strip = (Strip::None, parse_strip, [UNTRACKED] [VALUES: Strip::STR_VARIANTS],
         "tell the linker which information to strip (`none` (default), `debuginfo` or `symbols`)"),
     symbol_mangling_version: Option<SymbolManglingVersion> = (None,
-        parse_symbol_mangling_version, [TRACKED],
+        parse_symbol_mangling_version, [TRACKED] [VALUES: SymbolManglingVersion::STR_VARIANTS],
         "which mangling version to use for symbol names ('legacy', 'v0' (default), or 'hashed')"),
     target_cpu: Option<String> = (None, parse_opt_string, [TRACKED] { TARGET_MODIFIER: TargetCpu },
         "select target processor (`rustc --print target-cpus` for details)"),
@@ -2423,7 +2423,8 @@ options! {
     dump_mono_stats: SwitchWithOptPath = (SwitchWithOptPath::Disabled,
         parse_switch_with_opt_path, [UNTRACKED],
         "output statistics about monomorphization collection"),
-    dump_mono_stats_format: DumpMonoStatsFormat = (DumpMonoStatsFormat::Markdown, parse_dump_mono_stats, [UNTRACKED],
+    dump_mono_stats_format: DumpMonoStatsFormat = (DumpMonoStatsFormat::Markdown, parse_dump_mono_stats,
+        [UNTRACKED] [VALUES: DumpMonoStatsFormat::STR_VARIANTS],
         "the format to use for -Z dump-mono-stats (`markdown` (default) or `json`)"),
     #[rustc_lint_opt_deny_field_access("use `Session::dwarf_version` instead of this field")]
     dwarf_version: Option<u32> = (None, parse_opt_number, [TRACKED],
@@ -2647,7 +2648,8 @@ options! {
         Mandatory setting:
         `=Enable`
         Currently the only option available"),
-    on_broken_pipe: OnBrokenPipe = (OnBrokenPipe::Default, parse_on_broken_pipe, [TRACKED],
+    on_broken_pipe: OnBrokenPipe = (OnBrokenPipe::Default, parse_on_broken_pipe,
+        [TRACKED] [VALUES: OnBrokenPipe::STR_VARIANTS],
         "behavior of std::io::ErrorKind::BrokenPipe (SIGPIPE)"),
     osx_rpath_install_name: bool = (false, parse_bool, [TRACKED],
         "pass `-install_name @rpath/...` to the macOS linker (default: no)"),
@@ -2713,7 +2715,8 @@ options! {
     proc_macro_backtrace: bool = (false, parse_bool, [UNTRACKED],
          "show backtraces for panics during proc-macro execution (default: no)"),
     proc_macro_execution_strategy: ProcMacroExecutionStrategy = (ProcMacroExecutionStrategy::SameThread,
-        parse_proc_macro_execution_strategy, [UNTRACKED],
+        parse_proc_macro_execution_strategy,
+        [UNTRACKED] [VALUES: ProcMacroExecutionStrategy::STR_VARIANTS],
         "how to run proc-macro code (default: same-thread)"),
     profile_closures: bool = (false, parse_no_value, [UNTRACKED],
         "profile size of closures"),
@@ -2799,7 +2802,8 @@ written to standard error output)"),
     split_dwarf_inlining: bool = (false, parse_bool, [TRACKED],
         "provide minimal debug info in the object/executable to facilitate online \
          symbolication/stack traces in the absence of .dwo/.dwp files when using Split DWARF"),
-    split_dwarf_kind: SplitDwarfKind = (SplitDwarfKind::Split, parse_split_dwarf_kind, [TRACKED],
+    split_dwarf_kind: SplitDwarfKind = (SplitDwarfKind::Split, parse_split_dwarf_kind,
+        [TRACKED] [VALUES: SplitDwarfKind::STR_VARIANTS],
         "split dwarf variant (only if -Csplit-debuginfo is enabled and on relevant platform)
         (default: `split`)
 
@@ -2924,7 +2928,8 @@ written to standard error output)"),
     virtual_function_elimination: bool = (false, parse_bool, [TRACKED],
         "enables dead virtual function elimination optimization. \
         Requires `-Clto[=[fat,yes]]`"),
-    wasi_exec_model: Option<WasiExecModel> = (None, parse_wasi_exec_model, [TRACKED],
+    wasi_exec_model: Option<WasiExecModel> = (None, parse_wasi_exec_model,
+        [TRACKED] [VALUES: WasiExecModel::STR_VARIANTS],
         "whether to build a wasi command or reactor"),
     // This option only still exists to provide a more gradual transition path for people who need
     // the spec-complaint C ABI to be used.

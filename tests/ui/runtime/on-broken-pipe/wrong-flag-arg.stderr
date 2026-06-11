@@ -1,2 +1,4 @@
-error: incorrect value `wrong` for unstable option `on-broken-pipe` - either `kill`, `error`, or `inherit` was expected
+error: incorrect value `wrong` for unstable option `on-broken-pipe`
+  |
+  = help: valid values are: `kill`, `error`, `inherit`
 
