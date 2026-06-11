@@ -1174,7 +1174,16 @@ fn print_flag_list<T>(cmdline_opt: &str, flag_list: &[OptionDesc<T>]) {
             width = max_len
         );
         if let Some(values) = opt_desc.valid_values() {
-            let values = values.iter().map(|v| format!("`{v}`")).collect::<Vec<_>>().join(", ");
+            let mut values =
+                values.iter().map(|v| format!("`{v}`")).collect::<Vec<_>>().join(", ");
+            if opt_desc.accepts_bool() {
+                let bools = config::BOOL_FALLTHROUGH_SPELLINGS
+                    .iter()
+                    .map(|v| format!("`{v}`"))
+                    .collect::<Vec<_>>()
+                    .join(", ");
+                values.push_str(&format!(", or any boolean ({bools})"));
+            }
             // Indent the continuation line to align under the desc column:
             // 4 leading spaces + `cmdline_opt` (e.g. "-C") + space + name
             // (padded to `max_len`) + "=val -- ". Computing this dynamically

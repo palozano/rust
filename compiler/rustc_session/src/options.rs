@@ -198,6 +198,22 @@ fn tmod_push_impl(
     }
 }
 
+/// Canonical spellings accepted by `parse_bool` / `parse_string_enum_with_bool`,
+/// in declaration order. Used by help-text rendering and the structured
+/// "incorrect value" diagnostic when an option declares `[BOOL_FALLTHROUGH]`,
+/// so the listed vocabulary cannot drift from the parser.
+pub const BOOL_FALLTHROUGH_SPELLINGS: &[&str] =
+    &["y", "yes", "on", "true", "n", "no", "off", "false"];
+
+/// Validates that the optional trailing marker inside `[VALUES: <expr>, <marker>]`
+/// in an `options!` declaration is spelled exactly `BOOL`, and expands to the
+/// literal `true`. A typo (`Bool`, `BOOL_FALLTHROUGH`, …) is a compile error
+/// at the option declaration site. Used internally by [`options!`]; not part
+/// of the public surface.
+macro_rules! __bool_fallthrough_marker_present {
+    (BOOL) => { true };
+}
+
 macro_rules! top_level_options {
     (
         $(#[$top_level_attr:meta])*
@@ -504,7 +520,7 @@ macro_rules! options {
                 $init:expr,
                 $parse:ident,
                 [$dep_tracking_marker:ident]
-                $( [ VALUES: $values:expr ] )?
+                $( [ VALUES: $values:expr $( , $bool_marker:ident )? ] )?
                 $( { TARGET_MODIFIER: $tmod_variant:ident } )?
                 $( { MITIGATION: $mitigation_variant:ident } )?
                 ,
@@ -636,6 +652,8 @@ macro_rules! options {
                     setter: $optmod::$opt,
                     type_desc: desc::$parse,
                     valid_values: None $( .or(Some($values)) )?,
+                    accepts_bool: false
+                        $( $( || __bool_fallthrough_marker_present!($bool_marker) )? )?,
                     desc: $desc,
                     removed: None $( .or(Some(RemovedOption::$removed)) )?,
                     tmod: None $( .or(Some(
@@ -699,6 +717,12 @@ pub struct OptionDesc<O> {
     // "incorrect value" diagnostic listing these values instead of the
     // free-form `type_desc` description.
     valid_values: Option<&'static [&'static str]>,
+    // Whether the parser also accepts the boolean spellings listed in
+    // `BOOL_FALLTHROUGH_SPELLINGS` (declared via `[BOOL_FALLTHROUGH]` in
+    // the `options!` invocation). Used alongside `valid_values` so that
+    // help text and "incorrect value" diagnostics list both the enum
+    // vocabulary and the bool spellings the parser actually accepts.
+    accepts_bool: bool,
     // description for option from options table
     desc: &'static str,
     removed: Option<RemovedOption>,
@@ -721,6 +745,14 @@ impl<O> OptionDesc<O> {
     /// open-ended values (paths, numbers, free-form strings, …).
     pub fn valid_values(&self) -> Option<&'static [&'static str]> {
         self.valid_values
+    }
+
+    /// Whether this option's parser also accepts the boolean spellings in
+    /// [`BOOL_FALLTHROUGH_SPELLINGS`] (declared via `[BOOL_FALLTHROUGH]`
+    /// in the `options!` invocation). Always meaningful alongside
+    /// [`valid_values`](Self::valid_values).
+    pub fn accepts_bool(&self) -> bool {
+        self.accepts_bool
     }
 }
 
@@ -746,6 +778,7 @@ fn build_options<O: Default>(
                 setter,
                 type_desc,
                 valid_values,
+                accepts_bool,
                 desc,
                 removed,
                 tmod,
@@ -772,7 +805,7 @@ fn build_options<O: Default>(
                         ),
                         Some(value) => match valid_values {
                             Some(values) => build_unknown_option_value_diag(
-                                early_dcx, outputname, &key, value, values,
+                                early_dcx, outputname, &key, value, values, *accepts_bool,
                             )
                             .emit(),
                             None => early_dcx.early_fatal(format!(

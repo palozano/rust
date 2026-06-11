@@ -2068,15 +2068,27 @@ pub fn build_unknown_arg_value_diag<'a>(
 /// input and the option declared a fixed value vocabulary via `[VALUES: ...]`.
 ///
 /// `outputname` is `"codegen"` or `"unstable"`; `key` is the option name
-/// (e.g. `"strip"`).
+/// (e.g. `"strip"`). `accepts_bool` is `true` when the option also takes the
+/// boolean spellings in [`BOOL_FALLTHROUGH_SPELLINGS`] (declared via
+/// `[BOOL_FALLTHROUGH]`); the help line then lists them alongside
+/// `valid_values` so the user can see every accepted input.
 pub fn build_unknown_option_value_diag<'a>(
     early_dcx: &'a EarlyDiagCtxt,
     outputname: &str,
     key: &str,
     bad_value: &str,
     valid_values: &[&str],
+    accepts_bool: bool,
 ) -> Diag<'a, FatalAbort> {
-    let valid = valid_values.iter().map(|v| format!("`{v}`")).collect::<Vec<_>>().join(", ");
+    let mut valid = valid_values.iter().map(|v| format!("`{v}`")).collect::<Vec<_>>().join(", ");
+    if accepts_bool {
+        let bools = BOOL_FALLTHROUGH_SPELLINGS
+            .iter()
+            .map(|v| format!("`{v}`"))
+            .collect::<Vec<_>>()
+            .join(", ");
+        valid.push_str(&format!(", or any boolean ({bools})"));
+    }
     let mut diag = early_dcx.early_struct_fatal(format!(
         "incorrect value `{bad_value}` for {outputname} option `{key}`"
     ));
@@ -2434,6 +2446,7 @@ fn parse_opt_level(
                 "opt-level",
                 &cg.opt_level,
                 OptLevel::FROM_STR_VARIANTS,
+                false,
             )
             .emit()
         })
