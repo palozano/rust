@@ -2199,9 +2199,11 @@ options! {
     codegen_units: Option<usize> = (None, parse_opt_number, [UNTRACKED],
         "divide crate into N units to optimize in parallel"),
     collapse_macro_debuginfo: CollapseMacroDebuginfo = (CollapseMacroDebuginfo::Unspecified,
-        parse_collapse_macro_debuginfo, [TRACKED],
+        parse_collapse_macro_debuginfo,
+        [TRACKED] [VALUES: CollapseMacroDebuginfo::STR_VARIANTS, BOOL],
         "set option to collapse debuginfo for macros"),
-    control_flow_guard: CFGuard = (CFGuard::Disabled, parse_cfguard, [TRACKED] { MITIGATION: ControlFlowGuard },
+    control_flow_guard: CFGuard = (CFGuard::Disabled, parse_cfguard,
+        [TRACKED] [VALUES: CFGuard::STR_VARIANTS, BOOL] { MITIGATION: ControlFlowGuard },
         "use Windows Control Flow Guard (default: no)"),
     debug_assertions: Option<bool> = (None, parse_opt_bool, [TRACKED],
         "explicitly enable the `cfg(debug_assertions)` directive"),
@@ -2232,7 +2234,8 @@ options! {
         (consider using `-Cllvm-args=--inline-threshold=...`)",
         removed: Err),
     #[rustc_lint_opt_deny_field_access("use `Session::instrument_coverage` instead of this field")]
-    instrument_coverage: InstrumentCoverage = (InstrumentCoverage::No, parse_instrument_coverage, [TRACKED],
+    instrument_coverage: InstrumentCoverage = (InstrumentCoverage::No, parse_instrument_coverage,
+        [TRACKED] [VALUES: InstrumentCoverage::STR_VARIANTS, BOOL],
         "instrument the generated code to support LLVM source-based code coverage reports \
         (note, the compiler build config must include `profiler = true`); \
         implies `-C symbol-mangling-version=v0`"),
@@ -2260,7 +2263,8 @@ options! {
     llvm_args: Vec<String> = (Vec::new(), parse_list, [TRACKED],
         "a list of arguments to pass to LLVM (space separated)"),
     #[rustc_lint_opt_deny_field_access("use `Session::lto` instead of this field")]
-    lto: LtoCli = (LtoCli::Unspecified, parse_lto, [TRACKED],
+    lto: LtoCli = (LtoCli::Unspecified, parse_lto,
+        [TRACKED] [VALUES: LtoCli::STR_VARIANTS, BOOL],
         "perform LLVM link-time optimizations"),
     metadata: Vec<String> = (Vec::new(), parse_list, [TRACKED],
         "metadata to mangle symbol names with"),
@@ -2387,7 +2391,8 @@ options! {
         "whether the stable interface is being built"),
     cache_proc_macros: bool = (false, parse_bool, [TRACKED],
         "cache the results of derive proc macro invocations (potentially unsound!) (default: no"),
-    cf_protection: CFProtection = (CFProtection::None, parse_cfprotection, [TRACKED],
+    cf_protection: CFProtection = (CFProtection::None, parse_cfprotection,
+        [TRACKED] [VALUES: CFProtection::STR_VARIANTS, BOOL],
         "instrument control-flow architecture protection"),
     check_cfg_all_expected: bool = (false, parse_bool, [UNTRACKED],
         "show all expected values in check-cfg diagnostics (default: no)"),
@@ -2723,7 +2728,8 @@ options! {
         `vt-ptr-addr-discrimination - incorporate address discrimination in authenticated vtable pointers
         `vt-ptr-type-discrimination - incorporate type discrimination in authenticated vtable pointers
         Example: `-Zpointer-authentication=+calls,-init-fini`."),
-    polonius: Polonius = (Polonius::default(), parse_polonius, [TRACKED],
+    polonius: Polonius = (Polonius::default(), parse_polonius,
+        [TRACKED] [VALUES: Polonius::STR_VARIANTS, BOOL],
         "enable polonius-based borrow-checker (default: no)"),
     pre_link_arg: (/* redirected to pre_link_args */) = ((), parse_string_push, [UNTRACKED],
         "a single extra argument to prepend the linker invocation (can be used several times)"),

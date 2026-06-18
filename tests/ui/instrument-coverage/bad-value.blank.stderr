@@ -1,2 +1,4 @@
-error: incorrect value `` for codegen option `instrument-coverage` - one of: `y`, `yes`, `on`, `true`, `n`, `no`, `off` or `false` was expected
+error: incorrect value `` for codegen option `instrument-coverage`
+  |
+  = help: valid values are: `0`, `all`, or any boolean (`y`, `yes`, `on`, `true`, `n`, `no`, `off`, `false`)
 
