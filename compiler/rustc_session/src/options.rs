@@ -1533,18 +1533,7 @@ pub mod parse {
     }
 
     pub(crate) fn parse_time_passes_format(slot: &mut TimePassesFormat, v: Option<&str>) -> bool {
-        match v {
-            None => true,
-            Some("json") => {
-                *slot = TimePassesFormat::Json;
-                true
-            }
-            Some("text") => {
-                *slot = TimePassesFormat::Text;
-                true
-            }
-            Some(_) => false,
-        }
+        v.is_none() || parse_string_enum(slot, v)
     }
 
     pub(crate) fn parse_dump_mono_stats(slot: &mut DumpMonoStatsFormat, v: Option<&str>) -> bool {
@@ -2890,7 +2879,8 @@ written to standard error output)"),
         "measure time of each LLVM pass (default: no)"),
     time_passes: bool = (false, parse_bool, [UNTRACKED],
         "measure time of each rustc pass (default: no)"),
-    time_passes_format: TimePassesFormat = (TimePassesFormat::Text, parse_time_passes_format, [UNTRACKED],
+    time_passes_format: TimePassesFormat = (TimePassesFormat::Text, parse_time_passes_format,
+        [UNTRACKED] [VALUES: TimePassesFormat::STR_VARIANTS],
         "the format to use for -Z time-passes (`text` (default) or `json`)"),
     tiny_const_eval_limit: bool = (false, parse_bool, [TRACKED],
         "sets a tiny, non-configurable limit for const eval; useful for compiler tests"),

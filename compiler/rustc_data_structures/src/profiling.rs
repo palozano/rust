@@ -155,13 +155,15 @@ const EVENT_FILTERS_BY_NAME: &[(&str, EventFilter)] = &[
 /// Something that uniquely identifies a query invocation.
 pub struct QueryInvocationId(pub u32);
 
-/// Which format to use for `-Z time-passes`
-#[derive(Clone, Copy, PartialEq, Hash, Debug)]
-pub enum TimePassesFormat {
-    /// Emit human readable text
-    Text,
-    /// Emit structured JSON
-    Json,
+crate::string_enum! {
+    /// Which format to use for `-Z time-passes`
+    #[derive(Clone, Copy, PartialEq, Hash, Debug)]
+    pub enum TimePassesFormat {
+        /// Emit human readable text
+        Text => "text",
+        /// Emit structured JSON
+        Json => "json",
+    }
 }
 
 /// A reference to the SelfProfiler. It can be cloned and sent across thread
