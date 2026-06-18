@@ -3592,16 +3592,22 @@ rustc_data_structures::string_enum! {
     }
 }
 
-/// Whether extra span comments are included when dumping MIR, via the `-Z mir-include-spans` flag.
-/// By default, only enabled in the NLL MIR dumps, and disabled in all other passes.
-#[derive(Clone, Copy, Default, PartialEq, Debug)]
-pub enum MirIncludeSpans {
-    Off,
-    On,
-    /// Default: include extra comments in NLL MIR dumps only. Can be ignored and considered as
-    /// `Off` in all other cases.
-    #[default]
-    Nll,
+rustc_data_structures::string_enum! {
+    /// Whether extra span comments are included when dumping MIR, via the `-Z mir-include-spans` flag.
+    /// By default, only enabled in the NLL MIR dumps, and disabled in all other passes.
+    #[derive(Clone, Copy, Default, PartialEq, Debug)]
+    pub enum MirIncludeSpans {
+        /// Disable extra comments in all MIR dumps. Reachable only via
+        /// boolean false (`no`, `off`, `false`, etc.).
+        Off,
+        /// Enable extra comments in all MIR dumps. Reachable only via
+        /// boolean true (`yes`, `on`, `true`, etc.) or no value.
+        On,
+        /// Default: include extra comments in NLL MIR dumps only. Can be ignored and considered as
+        /// `Off` in all other cases.
+        #[default]
+        Nll => "nll",
+    }
 }
 
 impl MirIncludeSpans {

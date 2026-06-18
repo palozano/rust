@@ -2132,14 +2132,13 @@ pub mod parse {
     }
 
     pub(crate) fn parse_mir_include_spans(slot: &mut MirIncludeSpans, v: Option<&str>) -> bool {
-        *slot = match v {
-            Some("on" | "yes" | "y" | "true") | None => MirIncludeSpans::On,
-            Some("off" | "no" | "n" | "false") => MirIncludeSpans::Off,
-            Some("nll") => MirIncludeSpans::Nll,
-            _ => return false,
-        };
-
-        true
+        parse_string_enum_with_bool(
+            slot,
+            v,
+            Some(MirIncludeSpans::On),
+            Some(MirIncludeSpans::On),
+            Some(MirIncludeSpans::Off),
+        )
     }
 
     pub(crate) fn parse_align(slot: &mut Option<Align>, v: Option<&str>) -> bool {
@@ -2633,7 +2632,8 @@ options! {
         specified passes to be enabled, overriding all other checks. In particular, this will \
         enable unsound (known-buggy and hence usually disabled) passes without further warning! \
         Passes that are not specified are enabled or disabled by other flags as usual."),
-    mir_include_spans: MirIncludeSpans = (MirIncludeSpans::default(), parse_mir_include_spans, [UNTRACKED],
+    mir_include_spans: MirIncludeSpans = (MirIncludeSpans::default(), parse_mir_include_spans,
+        [UNTRACKED] [VALUES: MirIncludeSpans::STR_VARIANTS, BOOL],
         "include extra comments in mir pretty printing, like line numbers and statement indices, \
          details about types, etc. (boolean for all passes, 'nll' to enable in NLL MIR only, default: 'nll')"),
     mir_opt_bisect_limit: Option<usize> = (None, parse_opt_number, [TRACKED],
